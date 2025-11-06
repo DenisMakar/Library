@@ -1,9 +1,10 @@
 package main
 
-import(
+import (
 	// "errors"
 	"fmt"
 )
+
 // Структура представляет книгу
 type Book struct{
 	ID int
@@ -16,7 +17,7 @@ type Book struct{
 type Reader struct{
 	ID int
 	Name string
-	Books []int
+	Books map[int]string
 }
 // Структура представляет библиотеку
 type Libary struct{
@@ -63,7 +64,11 @@ func (li *Libary) DistributionBook(bookID int, readerID int) error{
 	}
 	// Добавляем книгу читателю
 	reader := li.Readers[readerID]
-	reader.Books = append(reader.Books, bookID)
+
+	if reader.Books == nil{
+		reader.Books =make(map[int]string)
+	}
+	reader.Books[bookID] = book.Name
 	li.Readers[readerID] = reader
 
 	// Пометка книги, что выдали
@@ -82,7 +87,12 @@ func (li *Libary) BookReturn(bookID int, readerID int) error {
 		return fmt.Errorf("книга с ID %d уже у нас", bookID)
 	}
 
-	
+	reader := li.Readers[readerID]
+	delete(reader.Books, readerID)
+
+	book.Access = true
+	li.Books[bookID] = book
+
 	return nil
 }
 
