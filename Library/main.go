@@ -9,8 +9,6 @@ import (
 type Book struct{
 	ID int
 	Name string
-	Author string
-	Age int
 	Access bool
 }
 // Структура представляет читателя
@@ -87,8 +85,18 @@ func (li *Libary) BookReturn(bookID int, readerID int) error {
 		return fmt.Errorf("книга с ID %d уже у нас", bookID)
 	}
 
-	reader := li.Readers[readerID]
-	delete(reader.Books, readerID)
+	reader, exist := li.Readers[readerID]
+	if !exist{
+		return fmt.Errorf("читателя с ID %d не существует", readerID)
+	}
+
+
+	if _, hasbook := reader.Books[bookID]; !hasbook{
+		return fmt.Errorf("книги с ID %d у читателя нет", bookID)
+	}
+
+	delete(reader.Books, bookID)
+	li.Readers[readerID] = reader 
 
 	book.Access = true
 	li.Books[bookID] = book
@@ -96,6 +104,41 @@ func (li *Libary) BookReturn(bookID int, readerID int) error {
 	return nil
 }
 
+func (li *Libary) AvailabilityReader(readerID int) error {
+
+	reader, exist := li.Readers[readerID]
+	if !exist{
+		return fmt.Errorf("читателя с ID %d не существует", readerID)
+	}
+	fmt.Println(reader.Books)
+
+	return nil
+}
+
+
+func main(){
+	library := &Libary{
+		Books: make(map[int]Book),
+		Readers: make(map[int]Reader),
+	}
+
+	err := library.AddBook(Book{1, "Ведьмак", true})
+	if err != nil {
+		fmt.Print("Ошибка при добавлении книги: ", err)
+		return
+	}
+
+	user := library.AddReader(Reader{2, "Igor", make(map[int]string)})
+	if user != nil {
+		fmt.Print("Ошибка при добавлении читателя: ", err)
+		return
+	}
+
+	library.DistributionBook(1, 2,)
+
+	library.AvailabilityReader(2)
+
+}
 
 
 
