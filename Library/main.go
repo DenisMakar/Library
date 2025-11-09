@@ -74,7 +74,7 @@ func (li *Libary) DistributionBook(bookID int, readerID int) error{
 	li.Books[bookID] = book
 	return nil	
 }
-
+// Функция возврата книги
 func (li *Libary) BookReturn(bookID int, readerID int) error {
 	book, exist := li.Books[bookID]
 	if !exist{
@@ -103,14 +103,18 @@ func (li *Libary) BookReturn(bookID int, readerID int) error {
 
 	return nil
 }
-
+// Функция, которая показывает книги у читателя
 func (li *Libary) AvailabilityReader(readerID int) error {
 
 	reader, exist := li.Readers[readerID]
 	if !exist{
 		return fmt.Errorf("читателя с ID %d не существует", readerID)
 	}
-	fmt.Println(reader.Books)
+
+	fmt.Printf("Книги у читателя %s:\n", reader.Name)
+	for id, name := range reader.Books {
+        fmt.Printf("- ID: %d, Название: %s\n", id, name)
+    }
 
 	return nil
 }
@@ -122,21 +126,67 @@ func main(){
 		Readers: make(map[int]Reader),
 	}
 
-	err := library.AddBook(Book{1, "Ведьмак", true})
-	if err != nil {
-		fmt.Print("Ошибка при добавлении книги: ", err)
-		return
+	ans := 1
+
+	for ans != 0{
+		fmt.Print("Выберите действие: \n 1-Добавить книгу \n 2-Добавить читателя \n 3-Выдать книгу читателю \n 4-Показать книги у читателя \n 5-Вернуть книгу \n 0-Выйти \n")
+		fmt.Scan(&ans)
+
+		switch ans{
+		case 1: 
+			var bookID int
+			var bookName string
+			fmt.Println(library.Books)
+			fmt.Println("Введите ID: ")
+			fmt.Scan(&bookID)
+			fmt.Println("Введите название книги")
+			fmt.Scan(&bookName)
+			library.AddBook(Book{bookID, bookName, true})
+
+		case 2:
+			var readerID int
+			var readerName string
+			fmt.Println(library.Readers)
+			fmt.Println("Введите ID: ")
+			fmt.Scan(&readerID)
+			fmt.Println("Введите имя читателя: ")
+			fmt.Scan(&readerName)
+			library.AddReader(Reader{readerID, readerName, make(map[int]string)})
+
+		case 3:
+			var readerID int
+			var bookID int
+			fmt.Println(library.Readers)
+			fmt.Println("Введите ID читателя: ")
+			fmt.Scan(&readerID)
+			fmt.Println(library.Books)
+			fmt.Println("Введите ID книги: ")
+			fmt.Scan(&bookID)
+			library.DistributionBook(bookID, readerID)
+
+		case 4:
+			var readerID int
+			fmt.Println("Введите ID читателя: ")
+			fmt.Scan(&readerID)
+			library.AvailabilityReader(readerID)
+		
+		case 5:
+			var readerID, bookID int
+			fmt.Println(library.Readers)
+			fmt.Println("Введите ID читателя: ")
+			fmt.Scan(&readerID)
+			library.AvailabilityReader(readerID)
+			fmt.Println("Введите ID книги: ")
+			fmt.Scan(&bookID)
+			library.BookReturn(bookID, readerID)
+		case 6:
+			fmt.Println(library.Books)	
+		case 7:
+			fmt.Println(library.Readers)
+		}
+
+
 	}
-
-	user := library.AddReader(Reader{2, "Igor", make(map[int]string)})
-	if user != nil {
-		fmt.Print("Ошибка при добавлении читателя: ", err)
-		return
-	}
-
-	library.DistributionBook(1, 2,)
-
-	library.AvailabilityReader(2)
 
 }
 
